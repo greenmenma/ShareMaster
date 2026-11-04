@@ -18,17 +18,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
-    "sqlite (コンテナなし)": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": false,
-      "applicationUrl": "http://localhost:5148",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "Database__Provider": "Sqlite",
-        "ConnectionStrings__ShareMasterDb": "Data Source=sharemaster-dev.db"
-      }
     }
   }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ShareMaster.Server.Data.Migrations
+namespace ShareMaster.Server.Data.Migrations.Sqlite
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -15,20 +15,20 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "Calendars",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    ParentId = table.Column<int>(type: "int", nullable: true),
-                    SortOrder = table.Column<int>(type: "int", nullable: false),
-                    WeeklyHolidays = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    UsePublicHolidays = table.Column<bool>(type: "bit", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    ParentId = table.Column<int>(type: "INTEGER", nullable: true),
+                    SortOrder = table.Column<int>(type: "INTEGER", nullable: false),
+                    WeeklyHolidays = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
+                    UsePublicHolidays = table.Column<bool>(type: "INTEGER", nullable: true),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    CreatedBy = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    UpdatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,18 +45,18 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "ChangeHistories",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CalendarId = table.Column<int>(type: "int", nullable: true),
-                    EntityType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    EntityKey = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Action = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Summary = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    BeforeJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AfterJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ChangedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    ChangedByName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ChangedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CalendarId = table.Column<int>(type: "INTEGER", nullable: true),
+                    EntityType = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    EntityKey = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Action = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Summary = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: false),
+                    BeforeJson = table.Column<string>(type: "TEXT", nullable: true),
+                    AfterJson = table.Column<string>(type: "TEXT", nullable: true),
+                    ChangedBy = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    ChangedByName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    ChangedAt = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -67,14 +67,14 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "DayTypes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Color = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
-                    IsHoliday = table.Column<bool>(type: "bit", nullable: false),
-                    SortOrder = table.Column<int>(type: "int", nullable: false),
-                    IsSystem = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Color = table.Column<string>(type: "TEXT", maxLength: 9, nullable: false),
+                    IsHoliday = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SortOrder = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsSystem = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -85,15 +85,15 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "Notifications",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    CalendarId = table.Column<int>(type: "int", nullable: true),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                    LinkUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserKey = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    CalendarId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Title = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Message = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false),
+                    LinkUrl = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    IsRead = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -104,10 +104,10 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "PublicHolidays",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Date = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -118,12 +118,12 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "SystemAdmins",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    DisplayName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserKey = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    DisplayName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    CreatedBy = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,10 +134,10 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    UserKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    DisplayName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    LastAccessedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    UserKey = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    DisplayName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    LastAccessedAt = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -148,12 +148,12 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "CalendarManagers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CalendarId = table.Column<int>(type: "int", nullable: false),
-                    UserKey = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    DisplayName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ReceiveNotifications = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CalendarId = table.Column<int>(type: "INTEGER", nullable: false),
+                    UserKey = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    DisplayName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    ReceiveNotifications = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -170,17 +170,17 @@ namespace ShareMaster.Server.Data.Migrations
                 name: "CalendarDays",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CalendarId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    DayTypeId = table.Column<int>(type: "int", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CalendarId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    DayTypeId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Note = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    CreatedBy = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    UpdatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {

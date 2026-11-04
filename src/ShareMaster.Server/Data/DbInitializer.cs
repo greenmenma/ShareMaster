@@ -21,8 +21,7 @@ public static class DbInitializer
 
         if (dbSettings.MigrateOnStartup)
         {
-            if (dbSettings.IsSqlite) await db.Database.EnsureCreatedAsync();
-            else await db.Database.MigrateAsync();
+            await db.Database.MigrateAsync();
             logger.LogInformation("データベースの初期化が完了しました（{Provider}）", dbSettings.Provider);
         }
 

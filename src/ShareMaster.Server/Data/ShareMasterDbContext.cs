@@ -3,7 +3,11 @@ using ShareMaster.Server.Data.Entities;
 
 namespace ShareMaster.Server.Data;
 
-public class ShareMasterDbContext(DbContextOptions<ShareMasterDbContext> options) : DbContext(options)
+/// <summary>
+/// アプリケーションの DbContext。DB 製品ごとのマイグレーションを分けるため、
+/// 実際には派生クラス（<see cref="SqliteShareMasterDbContext"/> / <see cref="SqlServerShareMasterDbContext"/>）を使う。
+/// </summary>
+public abstract class ShareMasterDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Calendar> Calendars => Set<Calendar>();
     public DbSet<CalendarManager> CalendarManagers => Set<CalendarManager>();
@@ -17,7 +21,7 @@ public class ShareMasterDbContext(DbContextOptions<ShareMasterDbContext> options
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        // SQLite（Docker なしの簡易起動・テスト用）は DateTimeOffset の並べ替えに対応しないため数値に変換する
+        // SQLite は DateTimeOffset の並べ替え・比較に対応しないため数値に変換する
         if (Database.IsSqlite())
         {
             configurationBuilder.Properties<DateTimeOffset>()

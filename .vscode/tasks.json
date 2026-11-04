@@ -10,6 +10,13 @@
       "group": "build"
     },
     {
+      "label": "build: apphost",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/src/ShareMaster.AppHost/ShareMaster.AppHost.csproj", "/property:GenerateFullPaths=true", "/consoleloggerparameters:NoSummary"],
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "build: solution",
       "type": "process",
       "command": "dotnet",

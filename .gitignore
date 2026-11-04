@@ -27,3 +27,6 @@ Thumbs.db
 
 # ---- VS Code（デバッグ用ブラウザプロファイルは除外）----
 .vscode/*-debug-profile/
+
+# ---- SQLite データベース ----
+App_Data/

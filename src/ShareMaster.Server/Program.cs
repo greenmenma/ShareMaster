@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Scalar.AspNetCore;
 using ShareMaster.Server.Auth;
@@ -17,14 +16,11 @@ var dbSection = builder.Configuration.GetSection(DatabaseSettings.SectionName);
 var dbSettings = dbSection.Get<DatabaseSettings>() ?? new DatabaseSettings();
 builder.Services.Configure<DatabaseSettings>(dbSection);
 
-// ---- データベース（本番：SQL Server / Azure SQL Database）----
-var connectionString = builder.Configuration.GetConnectionString(DatabaseSettings.ConnectionStringName)
-    ?? throw new InvalidOperationException($"接続文字列 '{DatabaseSettings.ConnectionStringName}' が設定されていません。");
-builder.Services.AddDbContext<ShareMasterDbContext>(options =>
-{
-    if (dbSettings.IsSqlite) options.UseSqlite(connectionString);
-    else options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure());
-});
+// ---- データベース（現在：SQLite / 移行先：SQL Server・Azure SQL Database）----
+var connectionString = builder.Configuration.GetConnectionString(DatabaseSettings.ConnectionStringName);
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new InvalidOperationException($"接続文字列 '{DatabaseSettings.ConnectionStringName}' が設定されていません。");
+builder.Services.AddShareMasterDatabase(dbSettings, connectionString);
 
 // ---- 認証（本番：Microsoft Entra ID / 開発：擬似ログイン）----
 if (authSettings.IsDevelopmentMode)
@@ -57,6 +53,10 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+// データ移行コマンド（SQLite → SQL Server 等）。Web サーバーは起動しない
+if (args.FirstOrDefault() == DataTransferCommand.CommandName)
+    return await DataTransferCommand.RunAsync(app);
+
 await app.InitializeDatabaseAsync();
 
 app.UseExceptionHandler();
@@ -81,7 +81,8 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 app.MapFallbackToFile("index.html");
 
-app.Run();
+await app.RunAsync();
+return 0;
 
 // 統合テストから参照するため
 public partial class Program;

@@ -1,16 +1,10 @@
 {
-  // VS Code のデバッグ構成（docs/03_開発環境.md 参照）
+  // VS Code のデバッグ構成（docs/03_開発環境.md 参照）。C# 拡張機能（ms-dotnettools.csharp）のみで動作する
   "version": "0.2.0",
   "configurations": [
     {
-      // C# Dev Kit が必要。AppHost 配下の Server もデバッガーがアタッチされる
-      "name": "Aspire: AppHost（SQL Server コンテナ・要 Docker）",
-      "type": "dotnet",
-      "request": "launch",
-      "projectPath": "${workspaceFolder}/src/ShareMaster.AppHost/ShareMaster.AppHost.csproj"
-    },
-    {
-      "name": "Server: SQLite（コンテナなし）",
+      // C# と React を両方デバッグする場合はこれ（複合構成「全体: Server + Vite + Chrome」）
+      "name": "Server",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build: server",
@@ -18,12 +12,28 @@
       "cwd": "${workspaceFolder}/src/ShareMaster.Server",
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://localhost:5148",
-        "Database__Provider": "Sqlite",
-        "ConnectionStrings__ShareMasterDb": "Data Source=sharemaster-dev.db"
+        "ASPNETCORE_URLS": "http://localhost:5148"
       },
-      "console": "internalConsole",
-      "stopAtEntry": false
+      "console": "internalConsole"
+    },
+    {
+      // Aspire ダッシュボード付きで Server と Vite を起動する（コンテナは使わない）
+      "name": "Aspire: AppHost",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build: apphost",
+      "program": "${workspaceFolder}/src/ShareMaster.AppHost/bin/Debug/net10.0/ShareMaster.AppHost.dll",
+      "cwd": "${workspaceFolder}/src/ShareMaster.AppHost",
+      "launchSettingsFilePath": "${workspaceFolder}/src/ShareMaster.AppHost/Properties/launchSettings.json",
+      "launchSettingsProfile": "http",
+      "console": "internalConsole"
+    },
+    {
+      // Aspire で起動した Server にブレークポイントを効かせる場合に使う（一覧から ShareMaster.Server を選択）
+      "name": "Server: プロセスにアタッチ",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
     },
     {
       "name": "Client: Vite 開発サーバー",
@@ -52,13 +62,18 @@
   ],
   "compounds": [
     {
-      "name": "全体: Aspire + Chrome",
-      "configurations": ["Aspire: AppHost（SQL Server コンテナ・要 Docker）", "Client: Chrome でデバッグ"],
+      "name": "全体: Server + Vite + Chrome",
+      "configurations": ["Server", "Client: Vite 開発サーバー", "Client: Chrome でデバッグ"],
       "stopAll": true
     },
     {
-      "name": "全体: SQLite（コンテナなし）+ Vite + Chrome",
-      "configurations": ["Server: SQLite（コンテナなし）", "Client: Vite 開発サーバー", "Client: Chrome でデバッグ"],
+      "name": "全体: Server + Vite + Edge",
+      "configurations": ["Server", "Client: Vite 開発サーバー", "Client: Edge でデバッグ"],
+      "stopAll": true
+    },
+    {
+      "name": "全体: Aspire + Chrome",
+      "configurations": ["Aspire: AppHost", "Client: Chrome でデバッグ"],
       "stopAll": true
     }
   ]

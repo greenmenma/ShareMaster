@@ -9,22 +9,21 @@
 | --- | --- |
 | バックエンド | .NET 10 / ASP.NET Core Web API（`src/ShareMaster.Server`） |
 | フロントエンド | React 19 + TypeScript + Vite + MUI（`src/ShareMaster.Client`） |
-| ローカル開発 | .NET Aspire 13（`src/ShareMaster.AppHost`）※本番構成には含めない |
-| DB | SQL Server 系（本番：Azure SQL Database 等 / 開発：SQL Server コンテナ） |
+| ローカル開発 | .NET Aspire 13（`src/ShareMaster.AppHost`）※本番構成には含めない・コンテナ不使用 |
+| DB | SQLite（現在）→ SQL Server / Azure SQL Database へ移行可能 |
 | 認証 | Microsoft Entra ID（本番） / 擬似ログイン（開発） |
 
 ## クイックスタート
 
-前提：.NET 10 SDK、Node.js 22 以上、Docker Desktop（または Podman）
+前提：.NET 10 SDK、Node.js 22 以上（Docker は不要）
 
 ```bash
 dotnet run --project src/ShareMaster.AppHost
 ```
 
-Aspire ダッシュボードが開き、SQL Server コンテナ → Server → Client の順に起動します。
-`client` リソースの URL を開くと画面が表示されます。
+Aspire ダッシュボードが開き、Server → Client の順に起動します。http://localhost:5173 を開くと画面が表示されます。
 
-Visual Studio / Rider / VS Code では `ShareMaster.slnx` を開き、`ShareMaster.AppHost` をスタートアップにしてデバッグ実行してください（Windows でも同様）。
+VS Code では「実行とデバッグ」から **全体: Server + Vite + Chrome** を選んで F5 を押します。Visual Studio / Rider では `ShareMaster.slnx` を開き、`ShareMaster.AppHost` をスタートアップにしてください（Windows でも同様）。
 
 詳細は [docs](docs/) を参照してください。
 

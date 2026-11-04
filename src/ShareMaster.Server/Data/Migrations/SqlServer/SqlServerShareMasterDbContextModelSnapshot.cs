@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShareMaster.Server.Data;
 
 #nullable disable
 
-namespace ShareMaster.Server.Data.Migrations
+namespace ShareMaster.Server.Data.Migrations.SqlServer
 {
-    [DbContext(typeof(ShareMasterDbContext))]
-    [Migration("20261104062136_InitialCreate")]
-    partial class InitialCreate
+    [DbContext(typeof(SqlServerShareMasterDbContext))]
+    partial class SqlServerShareMasterDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

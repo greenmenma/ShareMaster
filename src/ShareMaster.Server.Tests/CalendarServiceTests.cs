@@ -19,8 +19,9 @@ public sealed class CalendarServiceTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _conn.OpenAsync();
-        _db = new ShareMasterDbContext(new DbContextOptionsBuilder<ShareMasterDbContext>().UseSqlite(_conn).Options);
-        await _db.Database.EnsureCreatedAsync();
+        _db = new SqliteShareMasterDbContext(new DbContextOptionsBuilder<SqliteShareMasterDbContext>().UseSqlite(_conn).Options);
+        // 本番と同じマイグレーションでスキーマを作成する（マイグレーションの検証も兼ねる）
+        await _db.Database.MigrateAsync();
         var auth = new AuthSettings { Mode = "Development", DevUsers = [new DevUser { UserKey = "admin@dev.local", DisplayName = "管理者" }] };
         await DbInitializer.SeedMasterAsync(_db, auth, TimeProvider.System);
         await DbInitializer.SeedSampleAsync(_db, TimeProvider.System);
