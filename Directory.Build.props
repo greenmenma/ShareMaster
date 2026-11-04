@@ -1,0 +1,11 @@
+<Project>
+  <!-- 全プロジェクト共通の設定 -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!-- 推移的依存で既知の脆弱性があるパッケージを修正版に固定する -->
+  <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
+  </ItemGroup>
+</Project>

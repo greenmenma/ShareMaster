@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ShareMaster.AppHost/ShareMaster.AppHost.csproj" />
+    <Project Path="src/ShareMaster.Server.Tests/ShareMaster.Server.Tests.csproj" />
+    <Project Path="src/ShareMaster.Server/ShareMaster.Server.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,26 @@
+# ---- Claude Code（ルール・スキルは Git 管理しない）----
+CLAUDE.md
+.claude/
+
+# ---- .NET ----
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+*.db
+*.db-shm
+*.db-wal
+TestResults/
+publish/
+src/ShareMaster.Server/wwwroot/
+
+# ---- Node ----
+node_modules/
+dist/
+*.local
+
+# ---- OS ----
+.DS_Store
+Thumbs.db

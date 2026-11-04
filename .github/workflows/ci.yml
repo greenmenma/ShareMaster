@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/ShareMaster.Client/package-lock.json
+
+      - name: .NET ビルド・テスト
+        run: |
+          dotnet restore ShareMaster.slnx
+          dotnet build ShareMaster.slnx --no-restore -c Release
+          dotnet test ShareMaster.slnx --no-build -c Release
+
+      - name: React ビルド・テスト
+        working-directory: src/ShareMaster.Client
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - name: 本番用発行（Server + React）
+        run: dotnet publish src/ShareMaster.Server -c Release -o publish
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sharemaster-server
+          path: publish
