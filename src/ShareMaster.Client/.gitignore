@@ -1,3 +1,5 @@
 node_modules
 dist
 *.local
+# JavaScript SDK が mac / Linux で生成する "obj\Debug" 等の中間フォルダ
+obj*

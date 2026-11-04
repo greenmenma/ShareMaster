@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <!-- 推移的依存で既知の脆弱性があるパッケージを修正版に固定する -->
-  <ItemGroup>
+  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
 </Project>

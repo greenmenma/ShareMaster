@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.7204101">
+  <!-- React クライアント（Visual Studio のソリューションエクスプローラーで扱うためのプロジェクト） -->
+  <PropertyGroup>
+    <StartupCommand>npm run dev</StartupCommand>
+    <!-- npm audit は Windows の cmd.exe 前提のため無効化（脆弱性確認は npm audit を手動実行） -->
+    <ShouldRunNpmAudit>false</ShouldRunNpmAudit>
+    <JavaScriptTestRoot>src/</JavaScriptTestRoot>
+    <JavaScriptTestFramework>Vitest</JavaScriptTestFramework>
+    <!-- ビルド時に npm run build を実行し dist に出力する -->
+    <BuildOutputFolder>$(MSBuildProjectDirectory)/dist</BuildOutputFolder>
+  </PropertyGroup>
+</Project>
