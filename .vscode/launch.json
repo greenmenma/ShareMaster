@@ -1,0 +1,65 @@
+{
+  // VS Code のデバッグ構成（docs/03_開発環境.md 参照）
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // C# Dev Kit が必要。AppHost 配下の Server もデバッガーがアタッチされる
+      "name": "Aspire: AppHost（SQL Server コンテナ・要 Docker）",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/ShareMaster.AppHost/ShareMaster.AppHost.csproj"
+    },
+    {
+      "name": "Server: SQLite（コンテナなし）",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build: server",
+      "program": "${workspaceFolder}/src/ShareMaster.Server/bin/Debug/net10.0/ShareMaster.Server.dll",
+      "cwd": "${workspaceFolder}/src/ShareMaster.Server",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://localhost:5148",
+        "Database__Provider": "Sqlite",
+        "ConnectionStrings__ShareMasterDb": "Data Source=sharemaster-dev.db"
+      },
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Client: Vite 開発サーバー",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev -- --port 5173 --strictPort",
+      "cwd": "${workspaceFolder}/src/ShareMaster.Client"
+    },
+    {
+      // Vite（Aspire 起動・単独起動どちらも 5173）にブラウザデバッガーを接続する
+      "name": "Client: Chrome でデバッグ",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/src/ShareMaster.Client",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Client: Edge でデバッグ",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/src/ShareMaster.Client",
+      "userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "全体: Aspire + Chrome",
+      "configurations": ["Aspire: AppHost（SQL Server コンテナ・要 Docker）", "Client: Chrome でデバッグ"],
+      "stopAll": true
+    },
+    {
+      "name": "全体: SQLite（コンテナなし）+ Vite + Chrome",
+      "configurations": ["Server: SQLite（コンテナなし）", "Client: Vite 開発サーバー", "Client: Chrome でデバッグ"],
+      "stopAll": true
+    }
+  ]
+}

@@ -16,6 +16,8 @@ var server = builder.AddProject<Projects.ShareMaster_Server>("server")
     .WithHttpHealthCheck("/health");
 
 builder.AddViteApp("client", "../ShareMaster.Client")
+    // VS Code の Chrome デバッグ構成から接続できるようポートを固定する
+    .WithEndpoint("http", e => e.Port = 5173)
     .WithReference(server)
     .WaitFor(server)
     .WithExternalHttpEndpoints();
