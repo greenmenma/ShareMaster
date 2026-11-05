@@ -4,6 +4,7 @@ using Microsoft.Identity.Web;
 using Scalar.AspNetCore;
 using ShareMaster.Server.Auth;
 using ShareMaster.Server.Data;
+using ShareMaster.Server.Hosting;
 using ShareMaster.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.Configure<AuthSettings>(authSection);
 var dbSection = builder.Configuration.GetSection(DatabaseSettings.SectionName);
 var dbSettings = dbSection.Get<DatabaseSettings>() ?? new DatabaseSettings();
 builder.Services.Configure<DatabaseSettings>(dbSection);
+builder.Services.Configure<CanonicalUrlSettings>(builder.Configuration.GetSection(CanonicalUrlSettings.SectionName));
 
 // ---- データベース（現在：SQLite / 移行先：SQL Server・Azure SQL Database）----
 var connectionString = builder.Configuration.GetConnectionString(DatabaseSettings.ConnectionStringName);
@@ -60,6 +62,9 @@ if (args.FirstOrDefault() == DataTransferCommand.CommandName)
 await app.InitializeDatabaseAsync();
 
 app.UseExceptionHandler();
+
+// HTTP → HTTPS、ホスト名のみ → ドメイン付与（CanonicalUrl 設定）
+app.UseMiddleware<CanonicalUrlMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
