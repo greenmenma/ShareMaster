@@ -23,7 +23,8 @@
   <!-- 発行時に React クライアントをビルドして wwwroot に含める（本番構成：Server が SPA を配信） -->
   <Target Name="PublishClient" AfterTargets="ComputeFilesToPublish" Condition="'$(SkipClientBuild)' != 'true'">
     <Exec WorkingDirectory="$(ClientRoot)" Command="npm ci" />
-    <Exec WorkingDirectory="$(ClientRoot)" Command="npm run build" />
+    <!-- サブフォルダ配置時は -p:ClientBasePath=/ShareMaster/ のように指定する（未指定はルート配置） -->
+    <Exec WorkingDirectory="$(ClientRoot)" Command="npm run build" EnvironmentVariables="BASE_PATH=$(ClientBasePath)" />
     <ItemGroup>
       <ClientDistFiles Include="$(ClientRoot)dist\**" />
       <ResolvedFileToPublish Include="@(ClientDistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">

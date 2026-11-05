@@ -57,6 +57,14 @@ async function toError(res: Response): Promise<ApiError> {
   return new ApiError(res.status, message);
 }
 
+/** 配置先のパス（末尾スラッシュなし。ルート配置なら空文字） */
+export const BASE_PATH = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+/** アプリ内の絶対パス（/api/... 等）に配置先のパスを付ける */
+export function withBase(path: string): string {
+  return `${BASE_PATH}${path}`;
+}
+
 export async function api<T>(path: string, init?: RequestInit & { json?: unknown }): Promise<T> {
   const headers = new Headers(init?.headers);
   headers.set('Accept', 'application/json');
@@ -71,7 +79,7 @@ export async function api<T>(path: string, init?: RequestInit & { json?: unknown
   }
   if (devUserKey) headers.set('X-Dev-User', devUserKey);
 
-  const res = await fetch(path, { ...init, headers, body });
+  const res = await fetch(withBase(path), { ...init, headers, body });
   if (!res.ok) throw await toError(res);
   if (res.status === 204 || res.headers.get('Content-Length') === '0') return undefined as T;
   return (await res.json()) as T;

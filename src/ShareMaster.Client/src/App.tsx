@@ -10,6 +10,7 @@ import { DayTypesPage } from './pages/calendars/DayTypesPage';
 import { PublicHolidaysPage } from './pages/calendars/PublicHolidaysPage';
 import { HistoryPage } from './pages/calendars/HistoryPage';
 import { SystemAdminsPage } from './pages/SystemAdminsPage';
+import { BASE_PATH } from './api/http';
 
 const router = createBrowserRouter([
   {
@@ -32,7 +33,7 @@ const router = createBrowserRouter([
       { path: '*', element: <NotFoundPage /> },
     ],
   },
-]);
+], { basename: BASE_PATH || '/' });
 
 export function App() {
   return <RouterProvider router={router} />;

@@ -1,7 +1,7 @@
 // アプリ起動時の認証初期化。
 // 本番（EntraId）は MSAL でサインインし、開発（Development）は擬似ユーザーで動作する。
 import { InteractionRequiredAuthError, PublicClientApplication, type AccountInfo } from '@azure/msal-browser';
-import { getStoredDevUser, setDevUser, setTokenProvider } from '../api/http';
+import { getStoredDevUser, setDevUser, setTokenProvider, withBase } from '../api/http';
 import type { AuthConfig } from '../api/types';
 
 export interface AuthContextValue {
@@ -12,7 +12,7 @@ export interface AuthContextValue {
 }
 
 export async function bootstrapAuth(): Promise<AuthContextValue> {
-  const res = await fetch('/api/auth-config');
+  const res = await fetch(withBase('/api/auth-config'));
   if (!res.ok) throw new Error(`認証設定の取得に失敗しました（${res.status}）`);
   const config = (await res.json()) as AuthConfig;
 
@@ -32,8 +32,10 @@ export async function bootstrapAuth(): Promise<AuthContextValue> {
   }
 
   if (!config.clientId || !config.authority) throw new Error('Entra ID の設定（Auth:Spa）が不足しています。');
+  // サブフォルダ配置時もアプリのトップへ戻す（Entra ID のリダイレクト URI と一致させること）
+  const redirectUri = `${window.location.origin}${withBase('/')}`;
   const pca = new PublicClientApplication({
-    auth: { clientId: config.clientId, authority: config.authority, redirectUri: window.location.origin },
+    auth: { clientId: config.clientId, authority: config.authority, redirectUri, postLogoutRedirectUri: redirectUri },
     cache: { cacheLocation: 'localStorage' },
   });
   await pca.initialize();

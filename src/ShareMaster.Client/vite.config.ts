@@ -10,7 +10,15 @@ const serverUrl =
   process.env.services__server__http__0 ??
   'http://localhost:5148';
 
+// 配置先のパス（IIS のサブフォルダ等）。例：BASE_PATH=/ShareMaster/
+// 未指定ならサイトのルート（/）に配置する前提でビルドする。
+function normalizeBase(value: string | undefined): string {
+  const trimmed = (value ?? '').trim().replace(/^\/+|\/+$/g, '');
+  return trimmed ? `/${trimmed}/` : '/';
+}
+
 export default defineConfig({
+  base: normalizeBase(process.env.BASE_PATH),
   plugins: [react()],
   server: {
     port: Number(process.env.PORT ?? 5173),
