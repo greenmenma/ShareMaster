@@ -34,6 +34,13 @@ export interface User {
   userKey: string;
   displayName: string;
   email?: string | null;
+  /** 部署（AD / Entra ID から取得できた場合のみ） */
+  department?: string | null;
+}
+
+/** データ管理（データクリア・サンプルデータ挿入）の結果 */
+export interface DataMaintenanceResult {
+  message: string;
 }
 
 export interface Manager {

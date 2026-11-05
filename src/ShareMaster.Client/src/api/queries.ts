@@ -5,6 +5,7 @@ import type {
   Calendar,
   CalendarDays,
   CalendarSaveRequest,
+  DataMaintenanceResult,
   DayDetail,
   DayType,
   DayTypeSaveRequest,
@@ -203,5 +204,21 @@ export function useSystemAdminMutations() {
       onSuccess,
     }),
     remove: useMutation({ mutationFn: (id: number) => api<void>(`/api/system-admins/${id}`, { method: 'DELETE' }), onSuccess }),
+  };
+}
+
+/** データ管理（システム管理者のみ）。実行後はすべてのデータを読み直す */
+export function useDataMaintenance() {
+  const qc = useQueryClient();
+  const onSuccess = () => qc.invalidateQueries();
+  return {
+    clear: useMutation({
+      mutationFn: () => api<DataMaintenanceResult>('/api/data-maintenance/clear', { method: 'POST' }),
+      onSuccess,
+    }),
+    insertSample: useMutation({
+      mutationFn: () => api<DataMaintenanceResult>('/api/data-maintenance/sample', { method: 'POST' }),
+      onSuccess,
+    }),
   };
 }

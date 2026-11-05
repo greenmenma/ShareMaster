@@ -7,8 +7,8 @@
 | --- | --- | --- | --- |
 | GET | `/api/auth-config` | SPA 用の認証設定（`mode`：`Windows` / `EntraId` / `Development`） | 匿名 |
 | POST | `/api/client-logs` | 画面で発生したエラーをサーバーのログへ記録（`level`・`message`・`detail`・`url`） | 匿名 |
-| GET | `/api/me` | ログインユーザー情報（利用者マスタへ自動登録） | |
-| GET | `/api/users?search=` | 利用者検索 | |
+| GET | `/api/me` | ログインユーザー情報（利用者マスタへ自動登録。システム管理者が未登録なら本人を登録） | |
+| GET | `/api/users?search=` | 利用者検索（Windows：AD、Entra ID：Graph API、開発：開発用ユーザー。最大 30 件、検索語なしは空） | |
 | GET | `/api/calendars` | カレンダー一覧（継承後の定休曜日・編集可否を含む） | |
 | GET | `/api/calendars/{id}` | カレンダー詳細 | |
 | POST | `/api/calendars` | カレンダー追加 | システム管理者 |
@@ -27,6 +27,8 @@
 | GET | `/api/notifications` | 自分宛ての通知 | |
 | POST | `/api/notifications/{id}/read`, `/api/notifications/read-all` | 既読化 | |
 | GET/POST/DELETE | `/api/system-admins` | システム管理者 | システム管理者 |
+| POST | `/api/data-maintenance/clear` | データクリア（システム管理者・利用者以外を削除し、日種別・祝日を初期値に戻す） | システム管理者 |
+| POST | `/api/data-maintenance/sample` | サンプルデータ挿入（カレンダーが 0 件のときのみ） | システム管理者 |
 | GET | `/health` | ヘルスチェック | 匿名 |
 
 ## 外部システムからの利用

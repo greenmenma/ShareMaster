@@ -19,6 +19,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Identity.Web" Version="4.16.1" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.18.7" />
+    <PackageReference Include="System.DirectoryServices" Version="10.0.14" />
   </ItemGroup>
 
   <!--

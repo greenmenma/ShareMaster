@@ -7,12 +7,15 @@ public sealed record AuthConfigDto(string Mode, string? ClientId, string? Author
 
 public sealed record DevUserDto(string UserKey, string DisplayName);
 
+/// <summary>データ管理（データクリア・サンプルデータ挿入）の結果</summary>
+public sealed record DataMaintenanceResultDto(string Message);
+
 /// <summary>画面で発生したエラーの報告（Level：error / warning）</summary>
 public sealed record ClientLogDto(string? Level, string? Message, string? Detail, string? Url);
 
 public sealed record MeDto(string UserKey, string DisplayName, string? Email, bool IsSystemAdmin);
 
-public sealed record UserDto(string UserKey, string DisplayName, string? Email);
+public sealed record UserDto(string UserKey, string DisplayName, string? Email, string? Department = null);
 
 public sealed record ManagerDto(string UserKey, string DisplayName, bool ReceiveNotifications);
 

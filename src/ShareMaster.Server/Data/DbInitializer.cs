@@ -64,10 +64,14 @@ public static class DbInitializer
         await db.SaveChangesAsync();
     }
 
-    /// <summary>開発用サンプルデータ（本社＞滋賀＞システムA など）</summary>
-    public static async Task SeedSampleAsync(ShareMasterDbContext db, TimeProvider clock)
+    /// <summary>
+    /// サンプルデータ（本社＞滋賀＞システムA など）。カレンダーが 1 件でもあれば何もしない（false を返す）。
+    /// <paramref name="manager"/> を指定すると本社カレンダーの管理者をその利用者のみにする（画面からの挿入）。
+    /// 未指定なら開発用ユーザー（admin@dev.local 等）を各拠点の管理者にする（開発環境の起動時）。
+    /// </summary>
+    public static async Task<bool> SeedSampleAsync(ShareMasterDbContext db, TimeProvider clock, (string UserKey, string DisplayName)? manager = null)
     {
-        if (await db.Calendars.AnyAsync()) return;
+        if (await db.Calendars.AnyAsync()) return false;
         var now = clock.GetUtcNow();
         Calendar New(string code, string name, Calendar? parent, int sort, string? desc = null) => new()
         {
@@ -84,21 +88,33 @@ public static class DbInitializer
         sysC.WeeklyHolidays = "0";
         sysC.UsePublicHolidays = false;
 
-        hq.Managers.Add(new CalendarManager { UserKey = "admin@dev.local", DisplayName = "管理者 太郎" });
-        shiga.Managers.Add(new CalendarManager { UserKey = "shiga@dev.local", DisplayName = "滋賀 花子" });
-        sysA.Managers.Add(new CalendarManager { UserKey = "shiga@dev.local", DisplayName = "滋賀 花子" });
-        komaki.Managers.Add(new CalendarManager { UserKey = "komaki@dev.local", DisplayName = "小牧 次郎" });
-        sysB.Managers.Add(new CalendarManager { UserKey = "komaki@dev.local", DisplayName = "小牧 次郎" });
+        if (manager is { } m)
+        {
+            hq.Managers.Add(new CalendarManager { UserKey = m.UserKey, DisplayName = m.DisplayName });
+        }
+        else
+        {
+            hq.Managers.Add(new CalendarManager { UserKey = "admin@dev.local", DisplayName = "管理者 太郎" });
+            shiga.Managers.Add(new CalendarManager { UserKey = "shiga@dev.local", DisplayName = "滋賀 花子" });
+            sysA.Managers.Add(new CalendarManager { UserKey = "shiga@dev.local", DisplayName = "滋賀 花子" });
+            komaki.Managers.Add(new CalendarManager { UserKey = "komaki@dev.local", DisplayName = "小牧 次郎" });
+            sysB.Managers.Add(new CalendarManager { UserKey = "komaki@dev.local", DisplayName = "小牧 次郎" });
+        }
         db.Calendars.AddRange(hq, shiga, sysA, komaki, sysB, sysC);
         await db.SaveChangesAsync();
 
         var types = await db.DayTypes.ToDictionaryAsync(x => x.Code, x => x.Id);
         var year = clock.GetLocalNow().Year;
-        void Day(Calendar c, DateOnly d, string? type, string? name = null, string? note = null) => db.CalendarDays.Add(new CalendarDay
+        void Day(Calendar c, DateOnly d, string? type, string? name = null, string? note = null)
         {
-            CalendarId = c.Id, Date = d, DayTypeId = type is null ? null : types[type], Name = name, Note = note,
-            CreatedAt = now, CreatedBy = "system", UpdatedAt = now, UpdatedBy = "system",
-        });
+            // 日種別が削除・変更されている場合は、その日の設定を省略する
+            if (type is not null && !types.ContainsKey(type)) return;
+            db.CalendarDays.Add(new CalendarDay
+            {
+                CalendarId = c.Id, Date = d, DayTypeId = type is null ? null : types[type], Name = name, Note = note,
+                CreatedAt = now, CreatedBy = "system", UpdatedAt = now, UpdatedBy = "system",
+            });
+        }
 
         for (var y = year - 1; y <= year; y++)
         {
@@ -112,5 +128,6 @@ public static class DbInitializer
             Day(sysB, new DateOnly(y, 6, 30), "HALFDAY", null, "半期末棚卸");
         }
         await db.SaveChangesAsync();
+        return true;
     }
 }

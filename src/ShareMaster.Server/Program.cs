@@ -38,21 +38,31 @@ if (authSettings.IsDevelopmentMode)
         throw new InvalidOperationException("本番環境では Auth:Mode=Development は使用できません。");
     builder.Services.AddAuthentication(DevAuthenticationHandler.SchemeName)
         .AddScheme<AuthenticationSchemeOptions, DevAuthenticationHandler>(DevAuthenticationHandler.SchemeName, null);
+    builder.Services.AddScoped<IUserDirectory, DevUserDirectory>();
 }
 else if (authSettings.IsWindowsMode)
 {
     // IIS 配下では IIS の Windows 認証に委譲する（IIS 側で Windows 認証の有効化が必要）。Kestrel 単体でも動作する
     builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+    // 利用者の検索と表示名の取得は Active Directory から行う
+    builder.Services.AddScoped<IUserDirectory, ActiveDirectoryUserDirectory>();
+    builder.Services.AddScoped<IClaimsTransformation, DirectoryClaimsTransformation>();
 }
 else if (authSettings.IsEntraIdMode)
 {
-    builder.Services.AddAuthentication().AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+    // 利用者の検索は Microsoft Graph API から行う（アプリの許可 User.Read.All と AzureAd:ClientCredentials が必要）
+    builder.Services.AddAuthentication().AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"))
+        .EnableTokenAcquisitionToCallDownstreamApi()
+        .AddInMemoryTokenCaches();
+    builder.Services.AddHttpClient<IUserDirectory, GraphUserDirectory>();
 }
 else
 {
     throw new InvalidOperationException($"Auth:Mode '{authSettings.Mode}' は不正です（Windows / EntraId / Development のいずれか）。");
 }
 builder.Services.AddAuthorization();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<UserDirectorySettings>(builder.Configuration.GetSection(UserDirectorySettings.SectionName));
 
 // ---- アプリケーションサービス ----
 builder.Services.AddHttpContextAccessor();
@@ -61,6 +71,7 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<HistoryWriter>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<CalendarService>();
+builder.Services.AddScoped<DataMaintenanceService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
