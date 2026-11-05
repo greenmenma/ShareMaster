@@ -20,9 +20,20 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.18.7" />
   </ItemGroup>
 
+  <!--
+    npm ci は node_modules を毎回削除して再インストールするため遅い（特に Windows）。
+    package-lock.json が node_modules/.package-lock.json より新しいとき（＝依存が変わったとき）だけ実行する。
+    強制的に入れ直したい場合は node_modules を削除してから発行する。
+  -->
+  <Target Name="RestoreClient" Condition="'$(SkipClientBuild)' != 'true'"
+          Inputs="$(ClientRoot)package-lock.json" Outputs="$(ClientRoot)node_modules\.package-lock.json">
+    <Exec WorkingDirectory="$(ClientRoot)" Command="npm ci --no-audit --no-fund --prefer-offline" />
+    <!-- npm ci がファイルの更新日時を変えない場合に備えて明示的に更新し、次回の判定を確実にする -->
+    <Touch Files="$(ClientRoot)node_modules\.package-lock.json" />
+  </Target>
+
   <!-- 発行時に React クライアントをビルドして wwwroot に含める（本番構成：Server が SPA を配信） -->
-  <Target Name="PublishClient" AfterTargets="ComputeFilesToPublish" Condition="'$(SkipClientBuild)' != 'true'">
-    <Exec WorkingDirectory="$(ClientRoot)" Command="npm ci" />
+  <Target Name="PublishClient" AfterTargets="ComputeFilesToPublish" DependsOnTargets="RestoreClient" Condition="'$(SkipClientBuild)' != 'true'">
     <!-- サブフォルダ配置時は -p:ClientBasePath=/ShareMaster/ のように指定する（未指定はルート配置） -->
     <Exec WorkingDirectory="$(ClientRoot)" Command="npm run build" EnvironmentVariables="BASE_PATH=$(ClientBasePath)" />
     <ItemGroup>
