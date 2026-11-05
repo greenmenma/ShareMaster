@@ -27,6 +27,8 @@ public sealed class CurrentUser(IHttpContextAccessor accessor, ShareMasterDbCont
          ?? Principal.FindFirstValue(ClaimTypes.Upn)
          ?? Principal.FindFirstValue(ClaimTypes.Email)
          ?? Principal.FindFirstValue("oid")
+         // Windows 認証は名前（DOMAIN\user 形式）のみ持つ
+         ?? Principal.Identity?.Name
          ?? "anonymous").ToLowerInvariant();
 
     public string DisplayName => Principal.FindFirstValue("name") ?? Principal.Identity?.Name ?? UserKey;

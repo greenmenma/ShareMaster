@@ -6,6 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#51489D" />
     <title>IL共有マスター</title>
+    <script>
+      // 画面が真っ白になる障害（JS/CSS の読み込み失敗・起動前の例外）を検知し、
+      // メッセージを表示してサーバーのログへ記録する。アプリ本体が読み込めなくても動くようインラインで書く。
+      (function () {
+        var sent = 0;
+        function apiUrl() {
+          // 本番はサーバーが <base href> を埋め込む。開発時（base なし）はルート
+          var base = document.querySelector('base') ? document.baseURI : location.origin + '/';
+          return new URL('api/client-logs', base).href;
+        }
+        function report(message, detail) {
+          if (sent++ >= 10) return;
+          try {
+            fetch(apiUrl(), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ level: 'error', message: message, detail: detail || null, url: location.href }),
+              keepalive: true,
+            }).catch(function () {});
+          } catch (e) {}
+        }
+        function showMessage(text) {
+          var root = document.getElementById('root');
+          if (!root || root.childNodes.length > 0) return;
+          root.innerHTML =
+            '<div style="padding:24px;font-family:sans-serif"><h1 style="font-size:20px">IL共有マスターを表示できませんでした</h1>' +
+            '<p></p><p>システム管理者に連絡してください（エラー内容はサーバーのログに記録されています）。</p></div>';
+          root.getElementsByTagName('p')[0].textContent = text;
+        }
+        window.addEventListener(
+          'error',
+          function (e) {
+            var t = e.target;
+            if (t && t !== window && (t.src || t.href)) {
+              var url = t.src || t.href;
+              report('ファイルを読み込めませんでした：' + url, '配置先のパスや発行物（wwwroot）を確認してください。');
+              if (t.tagName === 'SCRIPT' || (t.tagName === 'LINK' && t.rel === 'stylesheet')) showMessage('ファイルを読み込めませんでした：' + url);
+            } else {
+              report('スクリプトエラー：' + (e.message || '不明'), e.error && e.error.stack ? e.error.stack : (e.filename || '') + ':' + (e.lineno || ''));
+            }
+          },
+          true,
+        );
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = e.reason;
+          report('未処理のエラー：' + (r && r.message ? r.message : String(r)), r && r.stack ? r.stack : null);
+        });
+        // 一定時間たっても何も表示されない場合も記録する
+        setTimeout(function () {
+          var root = document.getElementById('root');
+          if (root && root.childNodes.length === 0) {
+            report('画面が表示されませんでした（30 秒経過）', navigator.userAgent);
+            showMessage('画面の読み込みに時間がかかっているか、起動に失敗しました。');
+          }
+        }, 30000);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -30,3 +30,6 @@ Thumbs.db
 
 # ---- SQLite データベース ----
 App_Data/
+
+# ---- ログ ----
+logs/

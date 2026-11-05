@@ -19,7 +19,7 @@ public sealed class AuthController(IOptions<AuthSettings> settings, ICurrentUser
     {
         var s = settings.Value;
         return new AuthConfigDto(
-            s.IsDevelopmentMode ? AuthSettings.ModeDevelopment : AuthSettings.ModeEntraId,
+            s.NormalizedMode,
             s.Spa.ClientId, s.Spa.Authority, s.Spa.Scopes,
             s.IsDevelopmentMode ? s.DevUsers.Select(x => new DevUserDto(x.UserKey, x.DisplayName)).ToList() : []);
     }

@@ -57,8 +57,19 @@ async function toError(res: Response): Promise<ApiError> {
   return new ApiError(res.status, message);
 }
 
-/** 配置先のパス（末尾スラッシュなし。ルート配置なら空文字） */
-export const BASE_PATH = import.meta.env.BASE_URL.replace(/\/$/, '');
+/**
+ * 配置先のパス（末尾スラッシュなし。ルート配置なら空文字）。
+ * 本番はサーバーが index.html に埋め込む <base href> から、開発時は Vite の BASE_URL から求める。
+ */
+export const BASE_PATH = resolveBasePath();
+
+function resolveBasePath(): string {
+  const viteBase = import.meta.env.BASE_URL;
+  if (viteBase.startsWith('/')) return viteBase.replace(/\/$/, '');
+  const baseHref = document.querySelector('base')?.getAttribute('href');
+  if (!baseHref) return '';
+  return new URL(baseHref, window.location.origin).pathname.replace(/\/$/, '');
+}
 
 /** アプリ内の絶対パス（/api/... 等）に配置先のパスを付ける */
 export function withBase(path: string): string {

@@ -7,6 +7,9 @@ public sealed record AuthConfigDto(string Mode, string? ClientId, string? Author
 
 public sealed record DevUserDto(string UserKey, string DisplayName);
 
+/// <summary>画面で発生したエラーの報告（Level：error / warning）</summary>
+public sealed record ClientLogDto(string? Level, string? Message, string? Detail, string? Url);
+
 public sealed record MeDto(string UserKey, string DisplayName, string? Email, bool IsSystemAdmin);
 
 public sealed record UserDto(string UserKey, string DisplayName, string? Email);

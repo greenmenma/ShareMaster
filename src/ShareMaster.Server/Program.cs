@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.Identity.Web;
 using Scalar.AspNetCore;
 using ShareMaster.Server.Auth;
@@ -18,13 +19,19 @@ var dbSettings = dbSection.Get<DatabaseSettings>() ?? new DatabaseSettings();
 builder.Services.Configure<DatabaseSettings>(dbSection);
 builder.Services.Configure<CanonicalUrlSettings>(builder.Configuration.GetSection(CanonicalUrlSettings.SectionName));
 
+// ---- ログ（IIS ではコンソールを確認できないため、ファイルにも出力する）----
+var fileLogSection = builder.Configuration.GetSection(FileLoggingSettings.SectionName);
+builder.Services.Configure<FileLoggingSettings>(fileLogSection);
+if (fileLogSection.Get<FileLoggingSettings>()?.Enabled ?? true)
+    builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>();
+
 // ---- データベース（現在：SQLite / 移行先：SQL Server・Azure SQL Database）----
 var connectionString = builder.Configuration.GetConnectionString(DatabaseSettings.ConnectionStringName);
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException($"接続文字列 '{DatabaseSettings.ConnectionStringName}' が設定されていません。");
 builder.Services.AddShareMasterDatabase(dbSettings, connectionString);
 
-// ---- 認証（本番：Microsoft Entra ID / 開発：擬似ログイン）----
+// ---- 認証（本番：Windows 認証 または Microsoft Entra ID / 開発：擬似ログイン）----
 if (authSettings.IsDevelopmentMode)
 {
     if (builder.Environment.IsProduction())
@@ -32,9 +39,18 @@ if (authSettings.IsDevelopmentMode)
     builder.Services.AddAuthentication(DevAuthenticationHandler.SchemeName)
         .AddScheme<AuthenticationSchemeOptions, DevAuthenticationHandler>(DevAuthenticationHandler.SchemeName, null);
 }
-else
+else if (authSettings.IsWindowsMode)
+{
+    // IIS 配下では IIS の Windows 認証に委譲する（IIS 側で Windows 認証の有効化が必要）。Kestrel 単体でも動作する
+    builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+}
+else if (authSettings.IsEntraIdMode)
 {
     builder.Services.AddAuthentication().AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+}
+else
+{
+    throw new InvalidOperationException($"Auth:Mode '{authSettings.Mode}' は不正です（Windows / EntraId / Development のいずれか）。");
 }
 builder.Services.AddAuthorization();
 
@@ -59,8 +75,21 @@ var app = builder.Build();
 if (args.FirstOrDefault() == DataTransferCommand.CommandName)
     return await DataTransferCommand.RunAsync(app);
 
-await app.InitializeDatabaseAsync();
+app.Logger.LogInformation("起動します（環境：{Environment}、認証：{AuthMode}、DB：{Provider}、フォルダ：{ContentRoot}）",
+    app.Environment.EnvironmentName, authSettings.NormalizedMode, dbSettings.Provider, app.Environment.ContentRootPath);
 
+try
+{
+    await app.InitializeDatabaseAsync();
+}
+catch (Exception ex)
+{
+    app.Logger.LogCritical(ex, "データベースの初期化に失敗しました。");
+    throw;
+}
+
+// エラー応答（4xx/5xx）をログに残す。例外ハンドラーより外側に置き、最終的なステータスを記録する
+app.UseMiddleware<RequestErrorLoggingMiddleware>();
 app.UseExceptionHandler();
 
 // HTTP → HTTPS、ホスト名のみ → ドメイン付与（CanonicalUrl 設定）
@@ -75,8 +104,7 @@ else
     app.UseHsts();
 }
 
-// 本番は発行時に wwwroot へ配置した React のビルド成果物を配信する
-app.UseDefaultFiles();
+// 本番は発行時に wwwroot へ配置した React のビルド成果物を配信する（index.html は MapSpaFallback で返す）
 app.UseStaticFiles();
 
 app.UseAuthentication();
@@ -84,7 +112,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHealthChecks("/health");
-app.MapFallbackToFile("index.html");
+app.MapSpaFallback();
 
 await app.RunAsync();
 return 0;

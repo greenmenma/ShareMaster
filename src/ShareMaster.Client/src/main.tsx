@@ -9,6 +9,8 @@ import { App } from './App';
 import { AuthContext } from './auth/AuthContext';
 import { bootstrapAuth } from './auth/bootstrap';
 import { ApiError } from './api/http';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { reportClientError } from './utils/clientLog';
 
 dayjs.locale('ja');
 
@@ -31,7 +33,9 @@ bootstrapAuth()
           <CssBaseline />
           <QueryClientProvider client={queryClient}>
             <AuthContext.Provider value={auth}>
-              <App />
+              <ErrorBoundary>
+                <App />
+              </ErrorBoundary>
             </AuthContext.Provider>
           </QueryClientProvider>
         </ThemeProvider>
@@ -39,6 +43,7 @@ bootstrapAuth()
     );
   })
   .catch((e: unknown) => {
+    reportClientError(`起動に失敗しました：${e instanceof Error ? e.message : String(e)}`, e);
     root.render(
       <div style={{ padding: 24, fontFamily: 'sans-serif' }}>
         <h1 style={{ fontSize: 20 }}>IL共有マスターを起動できませんでした</h1>

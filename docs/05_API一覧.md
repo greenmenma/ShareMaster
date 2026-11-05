@@ -1,11 +1,12 @@
 # 05. API 一覧
 
-すべて `/api` 配下。`auth-config` 以外は認証必須です。エラーは ProblemDetails（`title` にメッセージ）で返します。
+すべて `/api` 配下。`auth-config`・`client-logs` 以外は認証必須です（Windows 認証で IIS の匿名認証を無効にしている場合は、すべて Windows 認証が必要）。エラーは ProblemDetails（`title` にメッセージ）で返します。
 開発環境では `/scalar` で API リファレンスを参照できます。
 
 | メソッド | パス | 内容 | 権限 |
 | --- | --- | --- | --- |
-| GET | `/api/auth-config` | SPA 用の認証設定 | 匿名 |
+| GET | `/api/auth-config` | SPA 用の認証設定（`mode`：`Windows` / `EntraId` / `Development`） | 匿名 |
+| POST | `/api/client-logs` | 画面で発生したエラーをサーバーのログへ記録（`level`・`message`・`detail`・`url`） | 匿名 |
 | GET | `/api/me` | ログインユーザー情報（利用者マスタへ自動登録） | |
 | GET | `/api/users?search=` | 利用者検索 | |
 | GET | `/api/calendars` | カレンダー一覧（継承後の定休曜日・編集可否を含む） | |

@@ -1,5 +1,6 @@
 // アプリ起動時の認証初期化。
-// 本番（EntraId）は MSAL でサインインし、開発（Development）は擬似ユーザーで動作する。
+// Windows 認証はブラウザと IIS が自動でサインインするため何もしない。
+// Entra ID は MSAL でサインインし、開発（Development）は擬似ユーザーで動作する。
 import { InteractionRequiredAuthError, PublicClientApplication, type AccountInfo } from '@azure/msal-browser';
 import { getStoredDevUser, setDevUser, setTokenProvider, withBase } from '../api/http';
 import type { AuthConfig } from '../api/types';
@@ -29,6 +30,11 @@ export async function bootstrapAuth(): Promise<AuthContextValue> {
         window.location.reload();
       },
     };
+  }
+
+  if (config.mode === 'Windows') {
+    // サインアウトはできない（Windows のログオンユーザーで自動的にサインインする）
+    return { config, account: null, signOut: () => undefined, switchDevUser: () => undefined };
   }
 
   if (!config.clientId || !config.authority) throw new Error('Entra ID の設定（Auth:Spa）が不足しています。');

@@ -10,6 +10,8 @@ export function UserMenu() {
   const { data: me } = useMe();
   const auth = useAuth();
   const isDev = auth.config.mode === 'Development';
+  // Windows 認証は Windows のログオンユーザーで動作するためサインアウトしない
+  const canSignOut = auth.config.mode === 'EntraId';
 
   return (
     <>
@@ -40,7 +42,7 @@ export function UserMenu() {
             ))}
           </Box>
         )}
-        {!isDev && (
+        {canSignOut && (
           <MenuItem onClick={auth.signOut}>
             <ListItemIcon>
               <LogoutIcon fontSize="small" />

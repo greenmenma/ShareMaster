@@ -1,10 +1,18 @@
 // サーバー API の型定義（ShareMaster.Server/Contracts/Dtos.cs と対応）
 
-export type AuthMode = 'Development' | 'EntraId';
+export type AuthMode = 'Development' | 'Windows' | 'EntraId';
 
 export interface DevUser {
   userKey: string;
   displayName: string;
+}
+
+/** 画面エラーの報告（サーバーの ClientLogDto） */
+export interface ClientLog {
+  level: 'error' | 'warning';
+  message: string;
+  detail?: string | null;
+  url?: string | null;
 }
 
 export interface AuthConfig {
