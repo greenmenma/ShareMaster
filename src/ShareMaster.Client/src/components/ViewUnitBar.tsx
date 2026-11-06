@@ -5,6 +5,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import dayjs from 'dayjs';
 import type { ViewState, ViewUnit } from '../utils/viewUnit';
 import type { YearRange } from '../api/types';
+import { FiscalPeriod } from './FiscalPeriod';
 
 interface Props {
   view: ViewState & { set: (v: Partial<ViewState>) => void };
@@ -25,7 +26,19 @@ export function ViewUnitBar({ view, range, children }: Props) {
   };
 
   const label =
-    unit === 'month' ? `${year}年${month}月` : unit === 'year' ? `${year}年` : range ? `${range.minYear}年〜${range.maxYear}年` : 'すべて';
+    unit === 'month' ? (
+      <>
+        {year}年{month}月<FiscalPeriod year={year} month={month} />
+      </>
+    ) : unit === 'year' ? (
+      <>
+        {year}年<FiscalPeriod year={year} />
+      </>
+    ) : range ? (
+      `${range.minYear}年〜${range.maxYear}年`
+    ) : (
+      'すべて'
+    );
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -50,7 +63,7 @@ export function ViewUnitBar({ view, range, children }: Props) {
             </IconButton>
           </span>
         </Tooltip>
-        <Typography sx={{ minWidth: 120, textAlign: 'center', fontWeight: 700, fontSize: 18 }}>{label}</Typography>
+        <Typography sx={{ minWidth: 180, textAlign: 'center', fontWeight: 700, fontSize: 18 }}>{label}</Typography>
         <Tooltip title="次へ">
           <span>
             <IconButton size="small" onClick={() => move(1)} disabled={unit === 'all'} aria-label="次へ">

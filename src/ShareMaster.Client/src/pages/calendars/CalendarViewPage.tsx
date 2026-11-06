@@ -24,6 +24,7 @@ import type { Dayjs } from 'dayjs';
 import { useCalendars, useDays, useMe, useYearRange } from '../../api/queries';
 import type { ResolvedDay } from '../../api/types';
 import { PageHeader } from '../../components/PageHeader';
+import { FiscalPeriod } from '../../components/FiscalPeriod';
 import { ViewUnitBar } from '../../components/ViewUnitBar';
 import { MonthCalendar } from '../../components/MonthCalendar';
 import { YearCalendar } from '../../components/YearCalendar';
@@ -139,6 +140,7 @@ export function CalendarViewPage() {
                 <Box key={y}>
                   <Typography variant="h2" sx={{ mb: 1, cursor: 'pointer' }} onClick={() => view.set({ unit: 'year', year: y })}>
                     {y}年
+                    <FiscalPeriod year={y} />
                   </Typography>
                   <YearCalendar
                     year={y}

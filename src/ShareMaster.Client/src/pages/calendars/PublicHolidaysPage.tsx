@@ -28,6 +28,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from 'dayjs';
 import { useMe, usePublicHolidayMutations, usePublicHolidays } from '../../api/queries';
 import { PageHeader } from '../../components/PageHeader';
+import { FiscalPeriod } from '../../components/FiscalPeriod';
 import { useSnackbar } from '../../components/useSnackbar';
 import { fmtJp } from '../../utils/date';
 
@@ -69,7 +70,10 @@ export function PublicHolidaysPage() {
       />
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         <IconButton onClick={() => setYear(year - 1)} aria-label="前年"><ChevronLeftIcon /></IconButton>
-        <Typography sx={{ fontWeight: 700, fontSize: 18, minWidth: 80, textAlign: 'center' }}>{year}年</Typography>
+        <Typography sx={{ fontWeight: 700, fontSize: 18, minWidth: 140, textAlign: 'center' }}>
+          {year}年
+          <FiscalPeriod year={year} />
+        </Typography>
         <IconButton onClick={() => setYear(year + 1)} aria-label="翌年"><ChevronRightIcon /></IconButton>
         <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>{holidays.length} 件</Typography>
       </Box>
